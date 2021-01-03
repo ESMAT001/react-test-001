@@ -1,56 +1,105 @@
-import logo from './logo.svg';
-import './App.css';
-let state = {
-  options: ["Aaa", "A", 'd'],
-  header: "Indecision app"
-}
-function App() {
+import React from 'react';
+import Header from './components/Header';
+import Button from './components/Button';
+import Options from './components/Options';
+import AddOption from './components/AddOption';
 
-  return (
-    <div className="container-fluid d-flex align-items-center">
-     
-    <div className=" col-11 col-md-9 col-lg-6 p-5 mx-auto">
-      <h2 className="text-center  font-weight-light">
-        {state.header}
-      </h2>
-      <hr className="hr"/>
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.deleteOptions = this.deleteOptions.bind(this);
+    this.pickOption = this.pickOption.bind(this);
+    this.handleAddOption = this.handleAddOption.bind(this);
+    this.deleteOption = this.deleteOption.bind(this)
+    this.state = {
+      options: ["Aaa", "A", 'dj'],
+      headerText: "Indecision app",
+      error: undefined
+    }
+  }
+  pickOption() {
+    let num = Math.floor(Math.random() * this.state.options.length);
+    let option = this.state.options[num];
+    alert(option)
+  }
+  deleteOptions() {
+    this.setState(() => {
+      return ({
+        options: []
+      })
+    })
+  }
+  deleteOption(valueToRemove) {
+    this.setState((prevState) => {
+      return {
+        options: prevState.options.filter((option) => valueToRemove !== option)
+      }
+    })
+  }
+  handleAddOption(e) {
+    e.preventDefault();
+    let textBox = document.getElementById('textBox');
+    let value = textBox.value.trim();
+    if (!value) {
+      return (
+        this.setState(() => {
+          return ({ error: "empty text field" })
+        })
+      )
+    } else if (this.state.options.indexOf(value) > -1) {
+      return (
+        this.setState(() => {
+          return ({ error: "Option already exist" })
+        })
+      )
+    }
+    this.setState((prevState) => {
+      return ({
+        options: prevState.options.concat(value),
+        error: undefined
+      })
+    })
 
-      <div className=" mx-auto">
-        <button className="btn btn-danger btn-block shadow">
-          Clear all
-        </button>
-        <button className="btn btn-warning btn-block shadow">
-          select
-        </button>
-        <hr className="hr" />
-        <ol className="p-0 my-3">
-          {
-          state.options.map((value) => {
-          return <li
-            className="shadow rounded bg-info text-white w-100 mb-3 p-1 pl-3 align-items-center d-flex justify-content-between"
-            key={value}>{value} <button className="btn text-white">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="  bi-x"
-                viewBox="0 0 16 16">
-                <path
-                  d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-              </svg>
-            </button>
-            </li>
-          })
-          }
+    textBox.value = "";
 
-        </ol>
-        <div className="input-group">
-          <input id="textBox" className="form-control" type="text" placeholder="Enter text here"/>
-          <div class="input-group-append">
-            <button class="btn btn-success shadow">Add</button>
+  }
+  render() {
+    return (
+      <div className="container-fluid d-flex align-items-center">
+        <div className=" col-11 col-md-9 col-lg-6 p-5 mx-auto">
+          <Header headerText={this.state.headerText} />
+          <hr className="hr" />
+          {this.state.error && <h3 className="text-danger h4 mb-3 font-weight-light" >{this.state.error}</h3>}
+          <div className=" mx-auto">
+            <Button
+              color={"danger"}
+              text={"clear all"}
+              runFunction={this.deleteOptions}
+              shouldHide={this.state.options.length === 0}
+            />
+            <Button
+              color={"warning"}
+              text={"Select"}
+              runFunction={this.pickOption}
+              shouldHide={this.state.options.length === 0}
+            />
+            <hr className="hr" />
+            <Options
+              options={this.state.options}
+              deleteOption={this.deleteOption}
+            />
+            <AddOption handleAddOption={this.handleAddOption} />
           </div>
         </div>
       </div>
+    );
+  }
 
-    </div>
-  </div>
-  );
 }
 
-export default App;
+
+
+
+
+
+
